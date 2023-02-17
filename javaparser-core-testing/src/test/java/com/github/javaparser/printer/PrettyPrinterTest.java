@@ -210,6 +210,55 @@ class PrettyPrinterTest {
     }
 
     @Test
+    void enumImplementsOneInterface() {
+        CompilationUnit cu = parse("enum X implements Serializable {A, B, C, D, E, F}");
+        assertEqualsStringIgnoringEol("enum X implements Serializable {\n" +
+                "\n" +
+                "    A,\n" +
+                "    B,\n" +
+                "    C,\n" +
+                "    D,\n" +
+                "    E,\n" +
+                "    F\n" +
+                "}\n", new DefaultPrettyPrinter().print(cu));
+    }
+
+    @Test
+    void enumImplementsMultipleInterfaces() {
+        CompilationUnit cu = parse("enum X implements Serializable, Cloneable {A, B, C, D, E, F}");
+        assertEqualsStringIgnoringEol("enum X implements Serializable, Cloneable {\n" +
+                "\n" +
+                "    A,\n" +
+                "    B,\n" +
+                "    C,\n" +
+                "    D,\n" +
+                "    E,\n" +
+                "    F\n" +
+                "}\n", new DefaultPrettyPrinter().print(cu));
+    }
+
+    @Test
+    void enumNoFieldsButMember() {
+        CompilationUnit cu = parse("enum X {;private int i;}");
+        assertEqualsStringIgnoringEol("enum X {\n" +
+                "    ;\n" +
+                "\n" +
+                "    private int i;\n" +
+                "}\n", new DefaultPrettyPrinter().print(cu));
+    }
+
+    @Test
+    void enumWithEntriesMembersAndInterface () {
+        CompilationUnit cu = parse("enum X implements Serializable {A, B, C;private int i;}");
+        assertEqualsStringIgnoringEol("enum X implements Serializable {\n" +
+                "\n" +
+                "    A, B, C;\n" +
+                "\n" +
+                "    private int i;\n" +
+                "}\n", new DefaultPrettyPrinter().print(cu));
+    }
+
+    @Test
     void printingInconsistentVariables() {
         FieldDeclaration fieldDeclaration = parseBodyDeclaration("int a, b;").asFieldDeclaration();
 
