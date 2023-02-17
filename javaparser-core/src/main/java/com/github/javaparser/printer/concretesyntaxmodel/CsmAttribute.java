@@ -25,6 +25,10 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.Stringable;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
+
+import java.util.List;
 
 import static com.github.javaparser.utils.CodeGenerationUtils.f;
 
@@ -44,6 +48,16 @@ public class CsmAttribute implements CsmElement {
     public void prettyPrint(Node node, SourcePrinter printer) {
         Object value = property.getRawValue(node);
         printer.print(PrintingHelper.printToString(value));
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        Object value = change.getValue(this.getProperty(), node);
+        String text = value.toString();
+        if (value instanceof Stringable) {
+            text = ((Stringable) value).asString();
+        }
+        elements.add(new CsmToken(this.getTokenType(node, value.toString(), text), text));
     }
 
     /**

@@ -20,14 +20,21 @@
  */
 package com.github.javaparser.printer.concretesyntaxmodel;
 
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.ConcreteSyntaxModel;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import static com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.toToken;
 
 public class CsmList implements CsmElement {
 
@@ -120,6 +127,77 @@ public class CsmList implements CsmElement {
                 following.prettyPrint(node, printer);
             }
         }
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        if (this.getProperty().isAboutNodes()) {
+            Object rawValue = change.getValue(this.getProperty(), node);
+            NodeList<?> nodeList;
+            if (rawValue instanceof Optional) {
+                Optional<?> optional = (Optional<?>) rawValue;
+                if (optional.isPresent()) {
+                    if (!(optional.get() instanceof NodeList)) {
+                        throw new IllegalStateException("Expected NodeList, found " + optional.get().getClass().getCanonicalName());
+                    }
+                    nodeList = (NodeList<?>) optional.get();
+                } else {
+                    nodeList = new NodeList<>();
+                }
+            } else {
+                if (!(rawValue instanceof NodeList)) {
+                    throw new IllegalStateException("Expected NodeList, found " + rawValue.getClass().getCanonicalName());
+                }
+                nodeList = (NodeList<?>) rawValue;
+            }
+            if (!nodeList.isEmpty()) {
+                this.getPreceeding().calculateSyntaxModelForNode(node, elements, change);
+                for (int i = 0; i < nodeList.size(); i++) {
+                    if (i != 0) {
+                        this.getSeparatorPre().calculateSyntaxModelForNode(node, elements, change);
+//                        calculatedSyntaxModelForNode(csmList.getSeparatorPre(), node, elements, change);
+                    }
+                    elements.add(new LexicalDifferenceCalculator.CsmChild(nodeList.get(i)));
+                    if (i != (nodeList.size() - 1)) {
+                        this.getSeparatorPost().calculateSyntaxModelForNode(node, elements, change);
+//                        calculatedSyntaxModelForNode(csmList.getSeparatorPost(), node, elements, change);
+                    }
+                }
+                this.getFollowing().calculateSyntaxModelForNode(node, elements, change);
+//                calculatedSyntaxModelForNode(csmList.getFollowing(), node, elements, change);
+            }
+        } else {
+            Collection<?> collection = (Collection<?>) change.getValue(this.getProperty(), node);
+            if (!collection.isEmpty()) {
+//                calculatedSyntaxModelForNode(csmList.getPreceeding(), node, elements, change);
+                this.getPreceeding().calculateSyntaxModelForNode(node, elements, change);
+
+                boolean first = true;
+                for (Iterator<?> it = collection.iterator(); it.hasNext(); ) {
+                    if (!first) {
+//                        calculatedSyntaxModelForNode(csmList.getSeparatorPre(), node, elements, change);
+                        this.getSeparatorPre().calculateSyntaxModelForNode(node, elements, change);
+
+                    }
+                    Object value = it.next();
+                    if (value instanceof Modifier) {
+                        Modifier modifier = (Modifier) value;
+                        elements.add(new CsmToken(toToken(modifier)));
+                    } else {
+                        throw new UnsupportedOperationException(it.next().getClass().getSimpleName());
+                    }
+                    if (it.hasNext()) {
+//                        calculatedSyntaxModelForNode(csmList.getSeparatorPost(), node, elements, change);
+                        this.getSeparatorPost().calculateSyntaxModelForNode(node, elements, change);
+
+                    }
+                    first = false;
+                }
+                this.getFollowing().calculateSyntaxModelForNode(node, elements, change);
+//                calculatedSyntaxModelForNode(csmList.getFollowing(), node, elements, change);
+            }
+        }
+
     }
 
     @Override

@@ -24,6 +24,11 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.ConcreteSyntaxModel;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
+import com.github.javaparser.printer.lexicalpreservation.changes.PropertyChange;
+
+import java.util.List;
 
 public class CsmSingleReference implements CsmElement {
 
@@ -42,6 +47,19 @@ public class CsmSingleReference implements CsmElement {
         Node child = property.getValueAsSingleReference(node);
         if (child != null) {
             ConcreteSyntaxModel.genericPrettyPrint(child, printer);
+        }
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        Node child;
+        if (change instanceof PropertyChange && ((PropertyChange) change).getProperty() == this.getProperty()) {
+            child = (Node) ((PropertyChange) change).getNewValue();
+        } else {
+            child = this.getProperty().getValueAsSingleReference(node);
+        }
+        if (child != null) {
+            elements.add(new LexicalDifferenceCalculator.CsmChild(child));
         }
     }
 

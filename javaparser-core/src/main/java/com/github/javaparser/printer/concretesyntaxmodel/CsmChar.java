@@ -20,9 +20,15 @@
  */
 package com.github.javaparser.printer.concretesyntaxmodel;
 
+import com.github.javaparser.GeneratedJavaParserConstants;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
+import com.github.javaparser.printer.lexicalpreservation.changes.PropertyChange;
+
+import java.util.List;
 
 public class CsmChar implements CsmElement {
 
@@ -41,6 +47,17 @@ public class CsmChar implements CsmElement {
         printer.print("'");
         printer.print(property.getValueAsStringAttribute(node));
         printer.print("'");
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        if (node instanceof CharLiteralExpr) {
+            if (change instanceof PropertyChange) {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.CHAR, "'" + ((PropertyChange) change).getNewValue() + "'"));
+            } else {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.CHAR, "'" + ((CharLiteralExpr) node).getValue() + "'"));
+            }
+        }
     }
 
     @Override
