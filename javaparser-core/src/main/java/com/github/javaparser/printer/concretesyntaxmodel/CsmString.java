@@ -20,9 +20,16 @@
  */
 package com.github.javaparser.printer.concretesyntaxmodel;
 
+import com.github.javaparser.GeneratedJavaParserConstants;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
+import com.github.javaparser.printer.lexicalpreservation.changes.PropertyChange;
+
+import java.util.List;
 
 public class CsmString implements CsmElement {
 
@@ -41,6 +48,28 @@ public class CsmString implements CsmElement {
         printer.print("\"");
         printer.print(property.getValueAsStringAttribute(node));
         printer.print("\"");
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        if (node instanceof StringLiteralExpr) {
+            // fix #2382:
+            // This method calculates the syntax model _after_ the change has been applied.
+            // If the given change is a PropertyChange, the returned model should
+            // contain the new value, otherwise the original/current value should be used.
+            if (change instanceof PropertyChange) {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.STRING_LITERAL, "\"" + ((PropertyChange) change).getNewValue() + "\""));
+            } else {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.STRING_LITERAL, "\"" + ((StringLiteralExpr) node).getValue() + "\""));
+            }
+        } else if (node instanceof TextBlockLiteralExpr) {
+            // FIXME: csm should be CsmTextBlock -- See also #2677
+            if (change instanceof PropertyChange) {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.TEXT_BLOCK_LITERAL, "\"\"\"" + ((PropertyChange) change).getNewValue() + "\"\"\""));
+            } else {
+                elements.add(new CsmToken(GeneratedJavaParserConstants.TEXT_BLOCK_LITERAL, "\"\"\"" + ((TextBlockLiteralExpr) node).getValue() + "\"\"\""));
+            }
+        }
     }
 
     @Override

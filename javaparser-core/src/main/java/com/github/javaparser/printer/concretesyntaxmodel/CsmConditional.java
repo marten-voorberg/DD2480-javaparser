@@ -24,6 +24,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 
 import java.util.Arrays;
 import java.util.List;
@@ -129,6 +130,16 @@ public class CsmConditional implements CsmElement {
             thenElement.prettyPrint(node, printer);
         } else {
             elseElement.prettyPrint(node, printer);
+        }
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        boolean satisfied = change.evaluate(this, node);
+        if (satisfied) {
+            this.getThenElement().calculateSyntaxModelForNode(node, elements, change);
+        } else {
+            this.getElseElement().calculateSyntaxModelForNode(node, elements, change);
         }
     }
 }

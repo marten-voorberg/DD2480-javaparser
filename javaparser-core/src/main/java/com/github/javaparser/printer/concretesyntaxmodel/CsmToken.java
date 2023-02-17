@@ -24,7 +24,10 @@ import com.github.javaparser.GeneratedJavaParserConstants;
 import com.github.javaparser.TokenTypes;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 import com.github.javaparser.utils.LineSeparator;
+
+import java.util.List;
 
 import static com.github.javaparser.TokenTypes.isEndOfLineToken;
 import static com.github.javaparser.TokenTypes.isWhitespaceButNotEndOfLine;
@@ -86,6 +89,11 @@ public class CsmToken implements CsmElement {
         } else {
             printer.print(getContent(node));
         }
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        elements.add(this);
     }
 
     @Override
