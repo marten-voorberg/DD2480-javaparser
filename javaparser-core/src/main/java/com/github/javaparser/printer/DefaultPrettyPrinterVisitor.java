@@ -24,9 +24,15 @@ import static com.github.javaparser.utils.PositionUtils.sortByBeginPosition;
 import static com.github.javaparser.utils.Utils.*;
 import static java.util.stream.Collectors.joining;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
@@ -1276,6 +1282,34 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printer.print(";");
     }
 
+    public static Set<Integer> coveredBranchesTotal = new HashSet<>();
+    public static Set<Integer> currentPath = new HashSet<>();
+
+    public static void atb(int i) {
+        coveredBranchesTotal.add(i);
+        currentPath.add(i);
+        try {
+            Files.writeString(Path.of("branch-coverage-output"), Arrays.toString(coveredBranchesTotal.toArray()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writePathToFile() {
+        try {
+            Path path = Path.of("path-coverage-output");
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+
+            String pathAsString = currentPath.stream().sorted().map(Object::toString).collect(Collectors.joining(",")) + "\n";
+            Files.writeString(path, pathAsString, StandardOpenOption.APPEND);
+            currentPath.clear();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void visit(final EnumDeclaration n, final Void arg) {
         printOrphanCommentsBeforeThisChildNode(n);
@@ -1284,45 +1318,76 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printModifiers(n.getModifiers());
         printer.print("enum ");
         n.getName().accept(this, arg);
+
+
         if (!n.getImplementedTypes().isEmpty()) {
+            // Branch 0
+            atb(0);
+
             printer.print(" implements ");
             for (final Iterator<ClassOrInterfaceType> i = n.getImplementedTypes().iterator(); i.hasNext(); ) {
+                atb(2);
                 final ClassOrInterfaceType c = i.next();
                 c.accept(this, arg);
                 if (i.hasNext()) {
+                    atb(3);
                     printer.print(", ");
+                } else {
+                    atb(4);
                 }
             }
+        } else {
+            atb(1);
         }
+
         printer.println(" {");
         printer.indent();
         if (n.getEntries().isNonEmpty()) {
+            atb(5);
             final boolean alignVertically = // Either we hit the constant amount limit in the configurations, or...
             n.getEntries().size() > getOption(ConfigOption.MAX_ENUM_CONSTANTS_TO_ALIGN_HORIZONTALLY).get().asInteger() || // any of the constants has a comment.
             n.getEntries().stream().anyMatch(e -> e.getComment().isPresent());
             printer.println();
             for (final Iterator<EnumConstantDeclaration> i = n.getEntries().iterator(); i.hasNext(); ) {
+                atb(7);
+
                 final EnumConstantDeclaration e = i.next();
                 e.accept(this, arg);
                 if (i.hasNext()) {
+                    atb(8);
+
                     if (alignVertically) {
+                        atb(12);
                         printer.println(",");
                     } else {
+                        atb(13);
                         printer.print(", ");
                     }
+                } else {
+                    atb(9);
                 }
             }
+        } else {
+            atb(6);
         }
+
         if (!n.getMembers().isEmpty()) {
+            atb(10);
             printer.println(";");
             printMembers(n.getMembers(), arg);
         } else {
+            atb(11);
             if (!n.getEntries().isEmpty()) {
+                atb(14);
                 printer.println();
+            } else {
+                atb(15);
             }
         }
         printer.unindent();
         printer.print("}");
+
+        writePathToFile();
     }
 
     @Override
