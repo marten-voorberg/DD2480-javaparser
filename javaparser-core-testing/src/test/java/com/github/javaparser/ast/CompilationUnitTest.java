@@ -135,28 +135,34 @@ class CompilationUnitTest {
 
         // test branch of Module
         ModuleDeclaration module = new ModuleDeclaration();
-        cu.setModule(module);
+        ModuleDeclaration module2 = new ModuleDeclaration();
+        cu.setModule(module2);
 
-        assertTrue(cu.remove(module));
+        assertFalse(cu.remove(module));
+        assertTrue(cu.remove(module2));
 
         // test branch of packageDeclaration
         PackageDeclaration packageDeclaration = new PackageDeclaration();
+        PackageDeclaration packageDeclaration2 = new PackageDeclaration();
         cu.setPackageDeclaration(packageDeclaration);
 
         assertTrue(cu.remove(packageDeclaration));
+        assertFalse(cu.remove(packageDeclaration2));
 
         // test branch of types
         NodeList<TypeDeclaration<?>> types = new NodeList<>();
         AnnotationDeclaration test5 = new AnnotationDeclaration();
+        AnnotationDeclaration test6 = new AnnotationDeclaration();
         types.add(test5);
+        types.add(test6);
         cu.setTypes(types);
 
-        assertTrue(cu.remove(test5));
+        assertTrue(cu.remove(test6));
 
         // test the last branch
-        ImportDeclaration test6 = new ImportDeclaration("finalTest", false, false);
+        ImportDeclaration test7 = new ImportDeclaration("finalTest", false, false);
 
-        assertFalse(cu.remove(test6));
+        assertFalse(cu.remove(test7));
     }
 
 }
