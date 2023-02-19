@@ -111,6 +111,15 @@ class CompilationUnitTest {
         assertFalse(cu.getPrimaryType().isPresent());
     }
 
+    /**
+     * To cover all the branches in the remove function, we test these 6 cases:
+     * 1) The node is null.
+     * 2) The node is contained in imports.
+     * 3) The node is contained in module.
+     * 4) The node is contained in packageDeclaration.
+     * 5) The node is contained in types.
+     * 6) The node isn't contained in any variable mentioned above.
+     */
     @Test
     void testRemove() throws IOException {
         Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
