@@ -21,6 +21,10 @@
 
 package com.github.javaparser.ast;
 
+import com.github.javaparser.ast.body.AnnotationDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.modules.ModuleDeclaration;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -56,12 +60,12 @@ class CompilationUnitTest {
     void testGetSourceRootWithBadPackageDeclaration() {
         assertThrows(RuntimeException.class, () -> {
             Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
-        Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "A.java"));
-        CompilationUnit cu = parse(testFile);
-        cu.getStorage().get().getSourceRoot();
-    });
-        
-        }
+            Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "A.java"));
+            CompilationUnit cu = parse(testFile);
+            cu.getStorage().get().getSourceRoot();
+        });
+
+    }
 
     @Test
     void testGetSourceRootInDefaultPackage() throws IOException {
@@ -72,13 +76,13 @@ class CompilationUnitTest {
         Path sourceRoot1 = cu.getStorage().get().getSourceRoot();
         assertEquals(sourceRoot, sourceRoot1);
     }
-    
+
     @Test
     void testGetPrimaryTypeName() throws IOException {
         Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
         Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "PrimaryType.java"));
         CompilationUnit cu = parse(testFile);
-        
+
         assertEquals("PrimaryType", cu.getPrimaryTypeName().get());
     }
 
@@ -88,13 +92,14 @@ class CompilationUnitTest {
 
         assertFalse(cu.getPrimaryTypeName().isPresent());
     }
+
     @Test
     void testGetPrimaryType() throws IOException {
         Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
         Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "PrimaryType.java"));
         CompilationUnit cu = parse(testFile);
 
-        assertEquals("PrimaryType",     cu.getPrimaryType().get().getNameAsString());
+        assertEquals("PrimaryType", cu.getPrimaryType().get().getNameAsString());
     }
 
     @Test
@@ -104,6 +109,54 @@ class CompilationUnitTest {
         CompilationUnit cu = parse(testFile);
 
         assertFalse(cu.getPrimaryType().isPresent());
+    }
+
+    @Test
+    void testRemove() throws IOException {
+        Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
+        Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "PrimaryType2.java"));
+        CompilationUnit cu = parse(testFile);
+
+        assertFalse(cu.remove(null));
+
+        // test branch of Imports
+        NodeList<ImportDeclaration> imports = new NodeList<>();
+        ImportDeclaration test1 = new ImportDeclaration("importTest1", true, true);
+        ImportDeclaration test2 = new ImportDeclaration("importTest2", false, true);
+        ImportDeclaration test3 = new ImportDeclaration("importTest3", true, false);
+        ImportDeclaration test4 = new ImportDeclaration("importTest4", false, false);
+        imports.add(test1);
+        imports.add(test2);
+        imports.add(test3);
+        imports.add(test4);
+        cu.setImports(imports);
+
+        assertTrue(cu.remove(test3));
+
+        // test branch of Module
+        ModuleDeclaration module = new ModuleDeclaration();
+        cu.setModule(module);
+
+        assertTrue(cu.remove(module));
+
+        // test branch of packageDeclaration
+        PackageDeclaration packageDeclaration = new PackageDeclaration();
+        cu.setPackageDeclaration(packageDeclaration);
+
+        assertTrue(cu.remove(packageDeclaration));
+
+        // test branch of types
+        NodeList<TypeDeclaration<?>> types = new NodeList<>();
+        AnnotationDeclaration test5 = new AnnotationDeclaration();
+        types.add(test5);
+        cu.setTypes(types);
+
+        assertTrue(cu.remove(test5));
+
+        // test the last branch
+        ImportDeclaration test6 = new ImportDeclaration("finalTest", false, false);
+
+        assertFalse(cu.remove(test6));
     }
 
 }
