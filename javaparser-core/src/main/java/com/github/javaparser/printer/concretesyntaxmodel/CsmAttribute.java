@@ -53,9 +53,6 @@ public class CsmAttribute implements CsmElement {
      * @param tokenText Operator's token text
      */
 
-    // so far branch 1,2,3,4,7,11, are not reached
-    //               0,5,6,8,9,10 are fine ~46% coverage
-    // new tests cover 1,2,3,4,7, resulting in ~91%
     public int getTokenType(Node node, String text, String tokenText) {
 
         switch(property) {
