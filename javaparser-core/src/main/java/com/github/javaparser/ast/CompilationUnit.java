@@ -46,9 +46,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -408,8 +406,8 @@ public class CompilationUnit extends Node {
      * Add an import to the list of {@link ImportDeclaration} of this compilation unit<br>
      * <b>This method check if no import with the same name is already in the list</b>
      *
-     * @param name the import name
-     * @param isStatic is it an "import static"
+     * @param name       the import name
+     * @param isStatic   is it an "import static"
      * @param isAsterisk does the import end with ".*"
      * @return this, the {@link CompilationUnit}
      */
@@ -442,7 +440,7 @@ public class CompilationUnit extends Node {
     /**
      * Add a class to the types of this compilation unit
      *
-     * @param name the class name
+     * @param name      the class name
      * @param modifiers the modifiers (like Modifier.PUBLIC)
      * @return the newly created class
      */
@@ -465,7 +463,7 @@ public class CompilationUnit extends Node {
     /**
      * Add an interface to the types of this compilation unit
      *
-     * @param name the interface name
+     * @param name      the interface name
      * @param modifiers the modifiers (like Modifier.PUBLIC)
      * @return the newly created class
      */
@@ -488,7 +486,7 @@ public class CompilationUnit extends Node {
     /**
      * Add an enum to the types of this compilation unit
      *
-     * @param name the enum name
+     * @param name      the enum name
      * @param modifiers the modifiers (like Modifier.PUBLIC)
      * @return the newly created class
      */
@@ -511,7 +509,7 @@ public class CompilationUnit extends Node {
     /**
      * Add an annotation declaration to the types of this compilation unit
      *
-     * @param name the annotation name
+     * @param name      the annotation name
      * @param modifiers the modifiers (like Modifier.PUBLIC)
      * @return the newly created class
      */
@@ -592,34 +590,69 @@ public class CompilationUnit extends Node {
         return getTypes().stream().filter(type -> type.getNameAsString().equals(recordName) && type instanceof RecordDeclaration).findFirst().map(t -> (RecordDeclaration) t);
     }
 
+    // Number of branches in remove()
+    public static final int numBranchesRemove = 17;
+
+    // Use a hashset to store the covered branches in remove()
+    public static Set<Integer> coveredBranchesRemove = new HashSet<>();
+
     @Override
     @Generated("com.github.javaparser.generator.core.node.RemoveMethodGenerator")
     public boolean remove(Node node) {
+        coveredBranchesRemove.add(0);
+
         if (node == null) {
+            coveredBranchesRemove.add(1);
             return false;
+        } else {
+            coveredBranchesRemove.add(2);
         }
+
         for (int i = 0; i < imports.size(); i++) {
+            coveredBranchesRemove.add(3);
             if (imports.get(i) == node) {
+                coveredBranchesRemove.add(4);
                 imports.remove(i);
                 return true;
+            } else {
+                coveredBranchesRemove.add(5);
             }
         }
+
         if (module != null) {
+            coveredBranchesRemove.add(6);
             if (node == module) {
+                coveredBranchesRemove.add(7);
                 removeModule();
                 return true;
+            } else {
+                coveredBranchesRemove.add(8);
             }
+        } else {
+            coveredBranchesRemove.add(9);
         }
+
         if (packageDeclaration != null) {
+            coveredBranchesRemove.add(10);
             if (node == packageDeclaration) {
+                coveredBranchesRemove.add(11);
                 removePackageDeclaration();
                 return true;
+            } else {
+                coveredBranchesRemove.add(12);
             }
+        } else {
+            coveredBranchesRemove.add(13);
         }
+
         for (int i = 0; i < types.size(); i++) {
+            coveredBranchesRemove.add(14);
             if (types.get(i) == node) {
+                coveredBranchesRemove.add(15);
                 types.remove(i);
                 return true;
+            } else {
+                coveredBranchesRemove.add(16);
             }
         }
         return super.remove(node);
@@ -788,7 +821,7 @@ public class CompilationUnit extends Node {
          * encoding passed as a parameter.
          *
          * @param makeOutput a function that formats the compilation unit
-         * @param encoding the encoding to use for the saved file
+         * @param encoding   the encoding to use for the saved file
          */
         public void save(Function<CompilationUnit, String> makeOutput, Charset encoding) {
             try {
