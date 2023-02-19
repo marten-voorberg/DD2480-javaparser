@@ -154,7 +154,5 @@ public interface CsmElement {
         return sequence(token(GeneratedJavaParserConstants.LBRACE), indent(), content, unindent(), token(GeneratedJavaParserConstants.RBRACE));
     }
 
-    default void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
-        throw new UnsupportedOperationException(this.getClass().getSimpleName() + " " + this);
-    };
+    void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change);
 }
