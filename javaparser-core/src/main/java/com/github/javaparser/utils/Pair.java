@@ -20,6 +20,9 @@
  */
 package com.github.javaparser.utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static com.github.javaparser.utils.CodeGenerationUtils.f;
@@ -41,18 +44,47 @@ public class Pair<A, B> {
         this.b = b;
     }
 
+    public static int[] branchesCovered = new int[8];
+
+    public static void addBranch(int i) {
+        branchesCovered[i] = 1;
+        try {
+
+            FileWriter fileWriter = new FileWriter("branches_covered_Pair.txt");
+
+            fileWriter.write(Arrays.toString(branchesCovered));
+            
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
+            addBranch(0);
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        else addBranch(1);
+        if (o == null || getClass() != o.getClass()) {
+            addBranch(2);
             return false;
+        }
+        else addBranch(3);
         Pair<?, ?> pair = (Pair<?, ?>) o;
-        if (!Objects.equals(a, pair.a))
+        if (!Objects.equals(a, pair.a)) {
+            addBranch(4);
             return false;
-        if (!Objects.equals(b, pair.b))
+        }
+        else addBranch(5);
+        if (!Objects.equals(b, pair.b)) {
+            addBranch(6);
             return false;
-        return true;
+        }
+        else {
+            addBranch(7);
+            return true;
+        }
     }
 
     @Override
