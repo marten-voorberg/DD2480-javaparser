@@ -22,7 +22,9 @@ package com.github.javaparser.printer.concretesyntaxmodel;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -51,6 +53,13 @@ public class CsmMix implements CsmElement {
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
         elements.forEach(e -> e.prettyPrint(node, printer));
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        List<CsmElement> mixElements = new LinkedList<>();
+        this.getElements().forEach(e -> e.calculateSyntaxModelForNode(node, mixElements, change));
+        elements.add(new CsmMix(mixElements));
     }
 
     @Override

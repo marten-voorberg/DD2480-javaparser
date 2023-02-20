@@ -22,6 +22,7 @@ package com.github.javaparser.printer.concretesyntaxmodel;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +49,11 @@ public class CsmSequence implements CsmElement {
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
         elements.forEach(e -> e.prettyPrint(node, printer));
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        this.getElements().forEach(e -> e.calculateSyntaxModelForNode(node, elements, change));
     }
 
     @Override

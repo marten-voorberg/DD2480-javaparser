@@ -24,6 +24,7 @@ import com.github.javaparser.GeneratedJavaParserConstants;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
 import com.github.javaparser.utils.LineSeparator;
 
 import java.util.Arrays;
@@ -152,4 +153,6 @@ public interface CsmElement {
     static CsmElement block(CsmElement content) {
         return sequence(token(GeneratedJavaParserConstants.LBRACE), indent(), content, unindent(), token(GeneratedJavaParserConstants.RBRACE));
     }
+
+    void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change);
 }

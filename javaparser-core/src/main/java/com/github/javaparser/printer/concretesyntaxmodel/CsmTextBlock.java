@@ -23,6 +23,9 @@ package com.github.javaparser.printer.concretesyntaxmodel;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.lexicalpreservation.changes.Change;
+
+import java.util.List;
 
 public class CsmTextBlock implements CsmElement {
 
@@ -43,6 +46,11 @@ public class CsmTextBlock implements CsmElement {
         // TODO: Confirm if we need to force this to use {@code \n} separators
         printer.print(property.getValueAsStringAttribute(node));
         printer.print("\"\"\"");
+    }
+
+    @Override
+    public void calculateSyntaxModelForNode(Node node, List<CsmElement> elements, Change change) {
+        throw new UnsupportedOperationException(this.getClass().getSimpleName() + " " + this);
     }
 
     @Override
