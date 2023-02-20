@@ -658,6 +658,15 @@ public class CompilationUnit extends Node {
         return super.remove(node);
     }
 
+    public void manualRemove(Node node) {
+        remove(node);
+        List<Integer> temp = new ArrayList<>(coveredBranchesRemove);
+        temp.sort(Comparator.naturalOrder());
+        System.out.println("Total branches: " + numBranchesRemove);
+        System.out.println("Covered branches: " + temp);
+        System.out.println("Coverage: " + temp.size() + "/" + numBranchesRemove + ", " + (float) temp.size() / numBranchesRemove);
+    }
+
     @Generated("com.github.javaparser.generator.core.node.RemoveMethodGenerator")
     public CompilationUnit removePackageDeclaration() {
         return setPackageDeclaration((PackageDeclaration) null);
