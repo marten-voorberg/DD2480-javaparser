@@ -44,6 +44,12 @@ import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -292,44 +298,96 @@ public class ObjectCreationExpr extends Expression implements NodeWithTypeArgume
         return JavaParserMetaModel.objectCreationExprMetaModel;
     }
 
+
+
+    public static boolean[] Branchcoverage = new boolean[12];
+    //finds path the function takes within the branches and prints it to a file
+    public static void findpath(){
+
+        try {
+            String sp = "";
+            Path path = Paths.get("Branchpath.txt");
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+                System.out.println("new file created");
+            }
+            for(int i=0; i<Branchcoverage.length; i++){
+                if(Branchcoverage[i]){
+                    sp += i + "-";
+                }
+                if(i == Branchcoverage.length-1){
+                    sp = sp.substring(0,sp.length()-1) + "\n";
+                }
+            }
+            byte[] strToBytes = sp.getBytes();
+            Files.write(path, strToBytes, StandardOpenOption.APPEND);
+            Arrays.fill(Branchcoverage,false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     @Override
     @Generated("com.github.javaparser.generator.core.node.ReplaceMethodGenerator")
     public boolean replace(Node node, Node replacementNode) {
         if (node == null) {
+            Branchcoverage[0]=true;
+            findpath();
             return false;
         }
+
         if (anonymousClassBody != null) {
+            Branchcoverage[1]=true;
             for (int i = 0; i < anonymousClassBody.size(); i++) {
+                Branchcoverage[2]=true;
                 if (anonymousClassBody.get(i) == node) {
                     anonymousClassBody.set(i, (BodyDeclaration) replacementNode);
+                    Branchcoverage[3]=true;
+                    findpath();
                     return true;
                 }
             }
         }
         for (int i = 0; i < arguments.size(); i++) {
+
+            Branchcoverage[4]=true;
             if (arguments.get(i) == node) {
+
                 arguments.set(i, (Expression) replacementNode);
+                Branchcoverage[5]=true;
+                findpath();
                 return true;
             }
         }
         if (scope != null) {
+            Branchcoverage[6]=true;
             if (node == scope) {
                 setScope((Expression) replacementNode);
+                Branchcoverage[7]=true;
+                findpath();
                 return true;
             }
         }
         if (node == type) {
             setType((ClassOrInterfaceType) replacementNode);
+            Branchcoverage[8]=true;
+            findpath();
             return true;
         }
         if (typeArguments != null) {
+            Branchcoverage[9]=true;
             for (int i = 0; i < typeArguments.size(); i++) {
+                Branchcoverage[10]=true;
                 if (typeArguments.get(i) == node) {
                     typeArguments.set(i, (Type) replacementNode);
+                    Branchcoverage[11]=true;
+                    findpath();
                     return true;
                 }
             }
         }
+
         return super.replace(node, replacementNode);
     }
 
