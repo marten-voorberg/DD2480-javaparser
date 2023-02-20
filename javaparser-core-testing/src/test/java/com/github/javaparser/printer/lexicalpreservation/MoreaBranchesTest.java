@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MoreaBranchesTest extends AbstractLexicalPreservingTest {
 
     @Test
-    public void testMoreBranches() {
+    public void testTypes() {
 
         considerCode("package com.wangym.test;\nclass A{ }");
         CsmAttribute csa = new CsmAttribute(ObservableProperty.TYPE);
@@ -42,7 +42,7 @@ public class MoreaBranchesTest extends AbstractLexicalPreservingTest {
         assertEquals(expected, csa.getTokenType(types.get(0), "class", "class A"));
     }
     @Test
-    public void testID3() {
+    public void testTypeException() {
 
         considerCode("public class A{ }");
         CsmAttribute csa = new CsmAttribute(ObservableProperty.TYPE);
@@ -55,7 +55,7 @@ public class MoreaBranchesTest extends AbstractLexicalPreservingTest {
     }
 
     @Test
-    public void testEvenMore() {
+    public void testKeyword() {
         considerCode("class A extends B{ }");
         CsmAttribute csa = new CsmAttribute(ObservableProperty.KEYWORD);
         NodeList<TypeDeclaration<?>> types = cu.getTypes();
