@@ -310,10 +310,7 @@ public class MethodResolutionLogic {
     }
 
     private static boolean CheckIfOneArgumentIsTrue(boolean expr1, boolean expr2, boolean expr3){
-        if(expr1 || expr2 || expr3){
-            return true;
-        }
-        return false;
+        return expr1 || expr2 || expr3;
     }
 
     private static boolean checkTypeVariable(ResolvedType expectedParam, ResolvedType actualParam, Map<String, ResolvedType> matchedParameters){
