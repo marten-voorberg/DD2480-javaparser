@@ -46,6 +46,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -591,7 +592,7 @@ public class CompilationUnit extends Node {
     }
 
     // Number of branches in remove()
-    public static final int numBranchesRemove = 17;
+    public static final int numBranchesRemove = 18;
 
     // Use a hashset to store the covered branches in remove()
     public static Set<Integer> coveredBranchesRemove = new HashSet<>();
@@ -655,16 +656,21 @@ public class CompilationUnit extends Node {
                 coveredBranchesRemove.add(16);
             }
         }
+        coveredBranchesRemove.add(17);
         return super.remove(node);
     }
 
-    public void manualRemove(Node node) {
-        remove(node);
+    public boolean manualRemove(Node node) {
+        boolean flag = remove(node);
         List<Integer> temp = new ArrayList<>(coveredBranchesRemove);
         temp.sort(Comparator.naturalOrder());
+        NumberFormat num = NumberFormat.getPercentInstance();
+        String coveragePercent = num.format((float) temp.size() / numBranchesRemove);
+
         System.out.println("Total branches: " + numBranchesRemove);
         System.out.println("Covered branches: " + temp);
-        System.out.println("Coverage: " + temp.size() + "/" + numBranchesRemove + ", " + (float) temp.size() / numBranchesRemove);
+        System.out.println("Coverage: " + temp.size() + "/" + numBranchesRemove + ", " + coveragePercent);
+        return flag;
     }
 
     @Generated("com.github.javaparser.generator.core.node.RemoveMethodGenerator")

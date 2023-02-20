@@ -106,4 +106,24 @@ class CompilationUnitTest {
         assertFalse(cu.getPrimaryType().isPresent());
     }
 
+    @Test
+    void testManualCoverageRemove() throws IOException {
+        Path sourceRoot = mavenModuleRoot(CompilationUnitTest.class).resolve(Paths.get("src", "test", "resources")).normalize();
+        Path testFile = sourceRoot.resolve(Paths.get("com", "github", "javaparser", "storage", "PrimaryType2.java"));
+        CompilationUnit cu = parse(testFile);
+        assertFalse(cu.manualRemove(null));
+        // test branch of Imports
+        NodeList<ImportDeclaration> imports = new NodeList<>();
+        ImportDeclaration test1 = new ImportDeclaration("importTest1", true, true);
+        ImportDeclaration test2 = new ImportDeclaration("importTest2", false, true);
+        ImportDeclaration test3 = new ImportDeclaration("importTest3", true, false);
+        ImportDeclaration test4 = new ImportDeclaration("importTest4", false, false);
+        imports.add(test1);
+        imports.add(test2);
+        imports.add(test3);
+        imports.add(test4);
+        cu.setImports(imports);
+        assertTrue(cu.manualRemove(test3));
+    }
+
 }
