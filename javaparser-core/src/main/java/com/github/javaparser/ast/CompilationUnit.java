@@ -595,34 +595,59 @@ public class CompilationUnit extends Node {
     @Override
     @Generated("com.github.javaparser.generator.core.node.RemoveMethodGenerator")
     public boolean remove(Node node) {
-        if (node == null) {
-            return false;
+        if (node == null) return false;
+
+        boolean cImports = checkImports(node);
+        boolean cModule = checkModule(node);
+        boolean cPackageDeclaration = checkPackageDeclaration(node);
+        boolean cTypes = checkTypes(node);
+        boolean flag = cImports || cModule || cPackageDeclaration || cTypes;
+
+        if (flag) {
+            return true;
+        } else {
+            return super.remove(node);
         }
+    }
+
+    private boolean checkImports(Node node) {
         for (int i = 0; i < imports.size(); i++) {
             if (imports.get(i) == node) {
                 imports.remove(i);
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean checkModule(Node node) {
         if (module != null) {
             if (node == module) {
                 removeModule();
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean checkPackageDeclaration(Node node) {
         if (packageDeclaration != null) {
             if (node == packageDeclaration) {
                 removePackageDeclaration();
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean checkTypes(Node node) {
         for (int i = 0; i < types.size(); i++) {
             if (types.get(i) == node) {
                 types.remove(i);
                 return true;
             }
         }
-        return super.remove(node);
+        return false;
     }
 
     @Generated("com.github.javaparser.generator.core.node.RemoveMethodGenerator")
