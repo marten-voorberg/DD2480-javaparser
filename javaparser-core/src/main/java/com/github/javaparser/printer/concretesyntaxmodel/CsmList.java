@@ -87,45 +87,53 @@ public class CsmList implements CsmElement {
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
         if (property.isAboutNodes()) {
-            NodeList<? extends Node> nodeList = property.getValueAsMultipleReference(node);
-            if (nodeList == null) {
-                return;
-            }
-            if (!nodeList.isEmpty() && preceeding != null) {
-                preceeding.prettyPrint(node, printer);
-            }
-            for (int i = 0; i < nodeList.size(); i++) {
-                if (separatorPre != null && i != 0) {
-                    separatorPre.prettyPrint(node, printer);
-                }
-                ConcreteSyntaxModel.genericPrettyPrint(nodeList.get(i), printer);
-                if (separatorPost != null && i != (nodeList.size() - 1)) {
-                    separatorPost.prettyPrint(node, printer);
-                }
-            }
-            if (!nodeList.isEmpty() && following != null) {
-                following.prettyPrint(node, printer);
-            }
+            prettyPrintIsAboutNodes(node, printer);
         } else {
-            Collection<?> values = property.getValueAsCollection(node);
-            if (values == null) {
-                return;
+            prettyPrintIsNotAboutNodes(node, printer);
+        }
+    }
+
+    private void prettyPrintIsAboutNodes(Node node, SourcePrinter printer) {
+        NodeList<? extends Node> nodeList = property.getValueAsMultipleReference(node);
+        if (nodeList == null) {
+            return;
+        }
+        if (!nodeList.isEmpty() && preceeding != null) {
+            preceeding.prettyPrint(node, printer);
+        }
+        for (int i = 0; i < nodeList.size(); i++) {
+            if (separatorPre != null && i != 0) {
+                separatorPre.prettyPrint(node, printer);
             }
-            if (!values.isEmpty() && preceeding != null) {
-                preceeding.prettyPrint(node, printer);
+            ConcreteSyntaxModel.genericPrettyPrint(nodeList.get(i), printer);
+            if (separatorPost != null && i != (nodeList.size() - 1)) {
+                separatorPost.prettyPrint(node, printer);
             }
-            for (Iterator<?> it = values.iterator(); it.hasNext(); ) {
-                if (separatorPre != null && it.hasNext()) {
-                    separatorPre.prettyPrint(node, printer);
-                }
-                printer.print(PrintingHelper.printToString(it.next()));
-                if (separatorPost != null && it.hasNext()) {
-                    separatorPost.prettyPrint(node, printer);
-                }
+        }
+        if (!nodeList.isEmpty() && following != null) {
+            following.prettyPrint(node, printer);
+        }
+    }
+
+    private void prettyPrintIsNotAboutNodes(Node node, SourcePrinter printer) {
+        Collection<?> values = property.getValueAsCollection(node);
+        if (values == null) {
+            return;
+        }
+        if (!values.isEmpty() && preceeding != null) {
+            preceeding.prettyPrint(node, printer);
+        }
+        for (Iterator<?> it = values.iterator(); it.hasNext(); ) {
+            if (separatorPre != null && it.hasNext()) {
+                separatorPre.prettyPrint(node, printer);
             }
-            if (!values.isEmpty() && following != null) {
-                following.prettyPrint(node, printer);
+            printer.print(PrintingHelper.printToString(it.next()));
+            if (separatorPost != null && it.hasNext()) {
+                separatorPost.prettyPrint(node, printer);
             }
+        }
+        if (!values.isEmpty() && following != null) {
+            following.prettyPrint(node, printer);
         }
     }
 
