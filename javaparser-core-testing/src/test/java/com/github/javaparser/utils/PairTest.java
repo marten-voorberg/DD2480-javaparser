@@ -39,4 +39,33 @@ class PairTest {
 
         assertEquals("<null, null>", pair.toString());
     }
+
+    @Test
+    void equalsReturnsTrue() {
+        Pair<String, String> pair1 = new Pair<>("abc", "def");
+        Pair<String, String> pair2 = new Pair<>("abc", "def");
+
+        assertEquals(true, pair1.equals(pair2));
+    }
+
+    @Test
+    void equalsReturnsFalse() {
+        Pair<String, String> pair1 = new Pair<>("abc", "def");
+        Pair<String, String> pair2 = new Pair<>("a", "b");
+
+        assertEquals(false, pair1.equals(pair2));
+    }
+    @Test
+    void equalsItselfIsTrue() {
+        Pair<String, String> pair1 = new Pair<>("abc", "def");
+
+        assertEquals(true, pair1.equals(pair1));
+    }
+
+    @Test
+    void equalsNullIsFalse() {
+        Pair<String, String> pair1 = new Pair<>("abc", "def");
+
+        assertEquals(false, pair1.equals(null));
+    }
 }
