@@ -74,13 +74,10 @@ class DifferenceElementCalculator {
                 CsmChild childA = (CsmChild) a;
                 CsmChild childB = (CsmChild) b;
                 return childA.getChild().equals(childB.getChild());
-            } else if (b instanceof CsmToken) {
+            } else if(otherInstances(b)){
                 return false;
-            } else if (b instanceof CsmIndent) {
-                return false;
-            } else if (b instanceof CsmUnindent) {
-                return false;
-            } else {
+            }
+            else {
                 throw new UnsupportedOperationException(a.getClass().getSimpleName() + " " + b.getClass().getSimpleName());
             }
         } else if (a instanceof CsmToken) {
@@ -92,21 +89,31 @@ class DifferenceElementCalculator {
                 CsmToken childA = (CsmToken) a;
                 CsmToken childB = (CsmToken) b;
                 return childA.equals(childB);
-            } else if (b instanceof CsmChild) {
+
+            } else if(otherInstances(b)){
                 return false;
-            } else if (b instanceof CsmIndent) {
-                return false;
-            } else if (b instanceof CsmUnindent) {
-                return false;
-            } else {
+            }
+            else {
                 throw new UnsupportedOperationException(a.getClass().getSimpleName() + " " + b.getClass().getSimpleName());
             }
-        } else if (a instanceof CsmIndent) {
+        }
+        return areMatchingIndents(a,b);
+    }
+
+    /*
+     * Checks whether two elements are both either indents or unindents
+     */
+    static boolean areMatchingIndents(CsmElement a, CsmElement b){
+        if(a instanceof CsmIndent){
             return b instanceof CsmIndent;
-        } else if (a instanceof CsmUnindent) {
+        }
+        if(a instanceof CsmUnindent){
             return b instanceof CsmUnindent;
         }
         throw new UnsupportedOperationException(a.getClass().getSimpleName() + " " + b.getClass().getSimpleName());
+    }
+    static boolean otherInstances(CsmElement elem){
+        return elem instanceof CsmChild || elem instanceof CsmIndent || elem instanceof CsmUnindent || elem instanceof CsmToken;
     }
 
     private static boolean replacement(CsmElement a, CsmElement b) {
